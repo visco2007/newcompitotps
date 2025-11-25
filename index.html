@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>E commerce</title>
+
+    <!-- jsPDF per generare PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+<body>
+
+<h2>e commerce viscomi</h2>
+
+Tipo dati:
+<select id="tipo">
+    <option value="json">JSON</option>
+    <option value="xml">XML</option>
+    <option value="csv">CSV</option>
+</select>
+
+Marca:
+<select id="marche">
+    <option value="">--Scegli--</option>
+</select>
+
+<hr>
+
+<div id="prodotti"></div>
+
+<button id="pdf">Stampa PDF</button>
+
+<script>
+
+var selectTipo = document.getElementById("tipo");
+var selectMarche = document.getElementById("marche");
+var divProdotti = document.getElementById("prodotti");
+var bottonePDF = document.getElementById("pdf");
+
+var elencoProdotti = []; 
+var carrello = [];       
+
+function caricaJSON() {
+    fetch("prodotti.json")
+    .then(function(risposta) {
+        return risposta.json();
+    })
+    .then(function(dati) {
+        elencoProdotti = dati;
+        preparaMarche();
+    });
+}
+
+-
+function caricaXML() {
+    fetch("prodotti.xml")
+    .then(function(risposta) {
+        return risposta.text();
+    })
+    .then(function(testo) {
+
+        // creo parser XML elementare
+        var parser = new DOMParser();
+        var xml = parser.parseFromString(testo, "text/xml");
+
+        elencoProdotti = []; // svuoto
+
+        var tutti = xml.getElementsByTagName("prodotto");
+        var i = 0;
+
+        while (i < tutti.length) {
+            var marca = tutti[i].getElementsByTagName("marca")[0].textContent;
+            var nome = tutti[i].getElementsByTagName("nome")[0].textContent;
+            var prezzo = tutti[i].getElementsByTagName("prezzo")[0].textContent;
+
+            elencoProdotti.push({
+                "marca": marca,
+                "nome": nome,
+                "prezzo": prezzo
+            });
+
+            i = i + 1;
+        }
+
+        preparaMarche();
+    });
+}
+
+
+function caricaCSV() {
+    fetch("prodotti.csv")
+    .then(function(risposta) {
+        return risposta.text();
+    })
+    .then(function(testo) {
+
+        elencoProdotti = []; // svuoto
+
+        var righe = testo.split("\n");
+        var i = 1; // parto da 1 perché la riga 0 è l'intestazione
+
+        while (i < righe.length) {
+
+            var riga = righe[i];
+            var campi = riga.split(",");
+
+            if (campi.length === 3) {
+                elencoProdotti.push({
+                    "marca": campi[0],
+                    "nome": campi[1],
+                    "prezzo": campi[2]
+                });
+            }
+
+            i = i + 1;
+        }
+
+        preparaMarche();
+    });
+}
+
+function preparaMarche() {
+    selectMarche.innerHTML = "<option value=''>--Scegli--</option>";
+
+    var marcheTrovate = [];
+
+    var i = 0;
+    while (i < elencoProdotti.length) {
+        var m = elencoProdotti[i].marca;
+
+        if (marcheTrovate.indexOf(m) === -1) {
+            marcheTrovate.push(m);
+        }
+
+        i = i + 1;
+    }
+
+    var j = 0;
+    while (j < marcheTrovate.length) {
+        selectMarche.innerHTML += "<option value='" + marcheTrovate[j] + "'>" + marcheTrovate[j] + "</option>";
+        j = j + 1;
+    }
+}
+
+function mostraProdotti() {
+    var marcaScelta = selectMarche.value;
+    divProdotti.innerHTML = "";
+    carrello = [];
+
+    if (marcaScelta === "") {
+        return;
+    }
+
+    var i = 0;
+    while (i < elencoProdotti.length) {
+        var p = elencoProdotti[i];
+
+        if (p.marca === marcaScelta) {
+
+            var testo =
+                "<div>" +
+                "<b>" + p.nome + "</b> - €" + p.prezzo +
+                " <button onclick=\"aggiungi('" + p.nome + "', '" + p.prezzo + "')\">Aggiungi</button>" +
+                "</div>";
+
+            divProdotti.innerHTML += testo;
+        }
+
+        i = i + 1;
+    }
+}
+
+function aggiungi(nome, prezzo) {
+    carrello.push({ "nome": nome, "prezzo": prezzo });
+    alert("aggiunto al carrello!");
+}
+
+function stampaPDF() {
+    if (carrello.length === 0) {
+        alert("carrello vuoto!");
+        return;
+    }
+
+    var ogg = window.jspdf.jsPDF;
+    var pdf = new ogg();
+
+    pdf.text("scntrino", 10, 10);
+
+    var y = 30;
+    var totale = 0;
+
+    var i = 0;
+    while (i < carrello.length) {
+        var r = carrello[i];
+        pdf.text(r.nome + " - €" + r.prezzo, 10, y);
+        totale += parseFloat(r.prezzo);
+        y += 10;
+        i = i + 1;
+    }
+
+    y += 10;
+    pdf.text("totale in €" + totale, 10, y);
+
+    pdf.save("scontrino.pdf");
+}
+
+selectTipo.onchange = function() {
+
+    if (selectTipo.value === "json") {
+        caricaJSON();
+    }
+    if (selectTipo.value === "xml") {
+        caricaXML();
+    }
+    if (selectTipo.value === "csv") {
+        caricaCSV();
+    }
+};
+
+selectMarche.onchange = mostraProdotti;
+bottonePDF.onclick = stampaPDF;
+
+caricaJSON();
+
+</script>
+
+</body>
+</html>
+
