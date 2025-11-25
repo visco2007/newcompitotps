@@ -1,0 +1,79 @@
+/* ======== STILE GENERALE ======== */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+}
+
+/* ======== TITOLI ======== */
+.titolo-principale {
+    background-color: #e60000;     /* Rosso MediaWorld */
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.sottotitolo {
+    text-align: center;
+    color: #444;
+    margin-top: 15px;
+}
+
+/* ======== CONTENITORE PAGINA ======== */
+.contenitore {
+    width: 80%;
+    background: white;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+}
+
+/* ======== SELECT ======== */
+.select-box {
+    padding: 8px;
+    margin: 10px;
+    border: 2px solid #e60000;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* ======== PRODOTTI ======== */
+#prodotti div {
+    background: #fff5f5;
+    border: 1px solid #e60000;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+#prodotti div b {
+    color: #e60000;
+    font-size: 18px;
+}
+
+/* ======== BOTTONI ======== */
+button {
+    padding: 6px 12px;
+    background-color: #e60000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #b30000;
+}
+
+/* Pulsante PDF */
+.bottone-pdf {
+    display: block;
+    width: 150px;
+    margin: 20px auto;
+    font-size: 16px;
+}
