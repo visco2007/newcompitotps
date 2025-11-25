@@ -107,9 +107,9 @@ function caricaCSV() {
 
             if (campi.length === 3) {
                 elencoProdotti.push({
-                    "marca": campi[0],
-                    "nome": campi[1],
-                    "prezzo": campi[2]
+                    "marca": campi[0].trim(),
+                    "nome": campi[1].trim(),
+                    "prezzo": campi[2].trim()
                 });
             }
 
@@ -146,7 +146,6 @@ function preparaMarche() {
 function mostraProdotti() {
     var marcaScelta = selectMarche.value;
     divProdotti.innerHTML = "";
-    carrello = [];
 
     if (marcaScelta === "") {
         return;
@@ -227,5 +226,6 @@ caricaJSON();
 
 </body>
 </html>
+
 
 
