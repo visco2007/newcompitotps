@@ -2,16 +2,14 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>E commerce</title>
+    <title>E-commerce Viscomi</title>
     <link rel="stylesheet" href="style.css">
-
     <!-- jsPDF per generare PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 </head>
 <body>
 
-<h2>e commerce viscomi</h2>
+<h2>e-commerce Viscomi</h2>
 
 Tipo dati:
 <select id="tipo">
@@ -52,7 +50,6 @@ function caricaJSON() {
     });
 }
 
--
 function caricaXML() {
     fetch("prodotti.xml")
     .then(function(risposta) {
@@ -60,11 +57,10 @@ function caricaXML() {
     })
     .then(function(testo) {
 
-        // creo parser XML elementare
         var parser = new DOMParser();
         var xml = parser.parseFromString(testo, "text/xml");
 
-        elencoProdotti = []; // svuoto
+        elencoProdotti = [];
 
         var tutti = xml.getElementsByTagName("prodotto");
         var i = 0;
@@ -75,19 +71,17 @@ function caricaXML() {
             var prezzo = tutti[i].getElementsByTagName("prezzo")[0].textContent;
 
             elencoProdotti.push({
-                "marca": marca,
-                "nome": nome,
-                "prezzo": prezzo
+                "marca": marca.trim(),
+                "nome": nome.trim(),
+                "prezzo": prezzo.trim()
             });
 
-            i = i + 1;
+            i++;
         }
 
         preparaMarche();
     });
 }
-
-
 function caricaCSV() {
     fetch("prodotti.csv")
     .then(function(risposta) {
@@ -95,10 +89,10 @@ function caricaCSV() {
     })
     .then(function(testo) {
 
-        elencoProdotti = []; // svuoto
+        elencoProdotti = [];
 
         var righe = testo.split("\n");
-        var i = 1; // parto da 1 perché la riga 0 è l'intestazione
+        var i = 1; // riga 0 intestazione
 
         while (i < righe.length) {
 
@@ -113,7 +107,7 @@ function caricaCSV() {
                 });
             }
 
-            i = i + 1;
+            i++;
         }
 
         preparaMarche();
@@ -128,21 +122,18 @@ function preparaMarche() {
     var i = 0;
     while (i < elencoProdotti.length) {
         var m = elencoProdotti[i].marca;
-
         if (marcheTrovate.indexOf(m) === -1) {
             marcheTrovate.push(m);
         }
-
-        i = i + 1;
+        i++;
     }
 
     var j = 0;
     while (j < marcheTrovate.length) {
         selectMarche.innerHTML += "<option value='" + marcheTrovate[j] + "'>" + marcheTrovate[j] + "</option>";
-        j = j + 1;
+        j++;
     }
 }
-
 function mostraProdotti() {
     var marcaScelta = selectMarche.value;
     divProdotti.innerHTML = "";
@@ -166,25 +157,25 @@ function mostraProdotti() {
             divProdotti.innerHTML += testo;
         }
 
-        i = i + 1;
+        i++;
     }
 }
 
 function aggiungi(nome, prezzo) {
     carrello.push({ "nome": nome, "prezzo": prezzo });
-    alert("aggiunto al carrello!");
+    alert("Aggiunto al carrello!");
 }
 
 function stampaPDF() {
     if (carrello.length === 0) {
-        alert("carrello vuoto!");
+        alert("Carrello vuoto!");
         return;
     }
 
     var ogg = window.jspdf.jsPDF;
     var pdf = new ogg();
 
-    pdf.text("scntrino", 10, 10);
+    pdf.text("Scontrino", 10, 10);
 
     var y = 30;
     var totale = 0;
@@ -195,26 +186,19 @@ function stampaPDF() {
         pdf.text(r.nome + " - €" + r.prezzo, 10, y);
         totale += parseFloat(r.prezzo);
         y += 10;
-        i = i + 1;
+        i++;
     }
 
     y += 10;
-    pdf.text("totale in €" + totale, 10, y);
+    pdf.text("Totale: €" + totale.toFixed(2), 10, y);
 
     pdf.save("scontrino.pdf");
 }
 
 selectTipo.onchange = function() {
-
-    if (selectTipo.value === "json") {
-        caricaJSON();
-    }
-    if (selectTipo.value === "xml") {
-        caricaXML();
-    }
-    if (selectTipo.value === "csv") {
-        caricaCSV();
-    }
+    if (selectTipo.value === "json") caricaJSON();
+    if (selectTipo.value === "xml") caricaXML();
+    if (selectTipo.value === "csv") caricaCSV();
 };
 
 selectMarche.onchange = mostraProdotti;
